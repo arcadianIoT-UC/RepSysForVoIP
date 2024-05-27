@@ -6,8 +6,8 @@ import string
 import time
 
 if len(sys.argv) != 3:
-    print("Usage: python3 5gAUSF -n for negative events or -p for positive events entityID")
-    print("Usage: python3 5gAUSF -p deviceExample1")
+    print("Usage: python3 CDR -n for negative events or -p for positive events IP")
+    print("Usage: python3 CDR -p deviceExample1")
     sys.exit(1)
 
 try:
@@ -16,7 +16,7 @@ try:
 except ValueError:
     print("Please provide a valid options. -p and deviceEXample1")
     option="-p"
-    entityID="deviceExample1"
+    entityID="127.0.0.1"
     #sys.exit(1)
 
 credentials = pika.PlainCredentials('noms', 'tutorial')
@@ -29,13 +29,13 @@ channel = connection.channel()
 
 channel.queue_declare(queue='rs_queue', auto_delete=True)
 
-exchangeName = '5gAUSF'
+exchangeName = 'CDR'
 routingKeyName = 'rs_queue'
 
 if (option == "-p"):
     
     dicio = {
-        "entityID": entityID,
+        "IP": entityID,
         "result": "success"
     }
 
@@ -50,7 +50,7 @@ if (option == "-p"):
 
 if (option == "-n"):
     dicio = {
-        "entityID": entityID,
+        "IP": entityID,
         "result": "not successful",
         "severity": 3.0
     }

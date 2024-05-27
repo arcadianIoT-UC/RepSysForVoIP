@@ -7,7 +7,28 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    
+      mysql:
+        condition: service_healthy
+  mysql:
+    image: mysql:latest
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=tutorialRoot
+      - MYSQL_DATABASE=dbAsterisk
+      - MYSQL_USER=noms
+      - MYSQL_PASSWORD=tutorial
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/sql-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ptutorialRoot"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   rabbitmq:
     image: rabbitmq:3.11-management
     restart: unless-stopped
@@ -23,4 +44,7 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
+
+volumes:
+  mysql_data:
 

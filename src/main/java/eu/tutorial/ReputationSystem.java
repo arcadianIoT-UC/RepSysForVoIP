@@ -9,6 +9,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import eu.tutorial.components.MyDB;
 import eu.tutorial.components.ReputationPolicies;
 import eu.tutorial.components.ReputationSystemModel;
 import eu.tutorial.utils.RCUtils;
@@ -34,6 +35,7 @@ public class ReputationSystem {
     private ReputationPolicies reputationPolicies = null;
     private boolean autoAck = false;
     private String consumerTag = null;
+    private MyDB mydb=null;
     
     public ReputationSystem(){
         try{
@@ -54,6 +56,11 @@ public class ReputationSystem {
             this.params.put("password", RCUtils.getEnvVariable("RMQ_PASSWORD"));
             this.params.put("ackType", ACKNOWLEDGE_TYPE);
             this.params.put("exchanges", RCUtils.getEnvVariable("RMQ_EXCHANGES"));
+            //DBstuff
+            this.params.put("dbURL", RCUtils.getEnvVariable("DB_URL"));
+            this.params.put("dbDB", RCUtils.getEnvVariable("DB_DB"));
+            this.params.put("dbUSER", RCUtils.getEnvVariable("DB_USER"));
+            this.params.put("dbPASS", RCUtils.getEnvVariable("DB_PASSWORD"));
 
             // Exchange list
             this.exchanges = Arrays.asList(params.get("exchanges").split(",[ ]*"));
@@ -65,6 +72,11 @@ public class ReputationSystem {
             factory.setPassword(params.get("password"));
             Connection connection = factory.newConnection();
             channel = connection.createChannel();
+
+            mydb = new MyDB(params.get("dbURL"), 
+                params.get("ddDB"), 
+                params.get("dbUSER"), 
+                params.get("dbPASS"));
 
             if (channel.isOpen()) {
              
@@ -145,20 +157,11 @@ public class ReputationSystem {
         JSONObject jsonToSend = new JSONObject();
 
         switch(exchangeName){
-            case "registration": // Initialize an entity
-
-                if (jsonReceived.has("entityID") && jsonReceived.has("type") && jsonReceived.has("info")) {
-                    reputationModel.addNewDataProcessor(jsonReceived.getString("entityID"));
-                    jsonToSend.put("currentScore", reputationModel.getReputationScore(jsonReceived.getString("entityID")));
-                    jsonToSend.put("previousScore", 0.0);
-                    jsonToSend.put("entityID", jsonReceived.getString("entityID"));
-                }
-
-                break;
-
-            case "5gAUSF":
-                if (jsonReceived.has("entityID") && jsonReceived.has("result") ) {
-                    reputationModel.addNewDataProcessor(jsonReceived.getString("entityID"));
+            
+            case "CDR":
+                //TODO: Processing needs to be updated according to what it will be defined.
+                if (jsonReceived.has("IP") && jsonReceived.has("result") ) {
+                    reputationModel.addNewDataProcessor(jsonReceived.getString("IP"));
                     boolean anomaly = false;
                     String result=  jsonReceived.getString("result");
                     if (result.equalsIgnoreCase("success")) {
@@ -166,40 +169,19 @@ public class ReputationSystem {
                     }else{
                         anomaly = true; // negative event
                     }
-                    double severity=-1;
                     
                     //Get previous score before updating
-                    double previousScore = reputationModel.getReputationScore(jsonReceived.getString("entityID"));
-
-                    if (jsonReceived.has("severity")){
-                        severity= jsonReceived.getDouble("severity");
-                        reputationModel.updateReputationScoreSeverity(jsonReceived.getString("entityID"), anomaly, severity);
-                    }else{ //update reputation
-                        reputationModel.updateReputationScore(jsonReceived.getString("entityID"), anomaly);
-                    }
+                    jsonToSend.put("currentScore", reputationModel.getReputationScore(jsonReceived.getString("IP")));
+                    jsonToSend.put("IP", jsonReceived.getString("IP"));
                     
-                    jsonToSend.put("currentScore", reputationModel.getReputationScore(jsonReceived.getString("entityID")));
-                    jsonToSend.put("previousScore", previousScore);
-                    jsonToSend.put("entityID", jsonReceived.getString("entityID"));
-                    
-                    //Check if there are policies:
-                    reputationPolicies.checkPoliciesToSend(reputationModel, jsonReceived.getString("entityID"), jsonToSend, severity);
+                    //Update the values in the database
+                    updateDB(jsonReceived.getString("IP"), jsonToSend.getDouble("currentScore" ));
                 }
                 break;
 
-            case "reputationPolicies":
-                if (jsonReceived.has("entityID")  ) {
-                    reputationPolicies.addPolicy(jsonReceived.getString("entityID"),
-                        jsonReceived.getInt("id"),
-                        jsonReceived.getDouble("minReputationScore"), jsonReceived.getDouble("maxReputationScore"),
-                        jsonReceived.getString("actionDesc"), jsonReceived.getInt("action"),
-                        jsonReceived.getInt("actionRatio"), jsonReceived.getDouble("eventSeverity"));
-                }
-                break;
         }
         
-        // send json file to reputation_updates exchange
-        if (!(jsonToSend.length() == 0) && jsonToSend.has("entityID") && jsonToSend.has("currentScore") && jsonToSend.has("previousScore")) {
+        if (!(jsonToSend.length() == 0) && jsonToSend.has("IP") && jsonToSend.has("currentScore") ) {
             String sentMessage = "SENDING MESSAGE " + jsonToSend.toString() + " to reputationUpdates exchange";
             System.out.println(sentMessage);
             
@@ -211,6 +193,7 @@ public class ReputationSystem {
         }
     }
 
+    //send json file to reputation_updates exchange 
     public void sendReputationUpdates(String exchange, String message)
             throws IOException, InterruptedException {
         while (channel == null) {
@@ -220,6 +203,11 @@ public class ReputationSystem {
         channel.basicPublish(exchange, "#", null, message.getBytes(StandardCharsets.UTF_8));
         System.out.println("Message sent to exchange '" + exchange + "' for recipient '"
                 + new String(message.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8) + "'");
-        
+    }
+
+    //Updates the DB
+    public boolean updateDB(String IP, double score)  {
+        boolean res=mydb.addUpdateScore(IP, score);
+        return res;
     }
 }

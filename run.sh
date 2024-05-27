@@ -29,8 +29,13 @@ export RMQ_PORT=5672
 export RMQ_USERNAME="noms"
 export RMQ_PASSWORD="tutorial"
 
-export RMQ_EXCHANGES="5gAUSF,reputationPolicies,registration"
+export RMQ_EXCHANGES="CDR"
 
+# Mysql INFO
+export DB_URL="jdbc:mysql://localhost:3306/dbAsterisk"
+export DB_DB="dbAsterisk"
+export DB_USER="noms"
+export DB_PASSWORD="tutorial"
 
 export EXECUTOR_MEMORY="10g"
 export DRIVER_MEMORY="10g"

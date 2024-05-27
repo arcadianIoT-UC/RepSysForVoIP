@@ -1,0 +1,27 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "sqltools.connections": [
+        {
+            "server": "10.3.2.164",
+            "port": 9009,
+            "previewLimit": 50,
+            "askForPassword": true,
+            "driver": "Cassandra",
+            "name": "aiot-rs-prod.dei.uc.pt:9009",
+            "username": "cassandra"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "RepSysDB",
+            "database": "dbAsterisk",
+            "username": "noms"
+        }
+    ]
+}
