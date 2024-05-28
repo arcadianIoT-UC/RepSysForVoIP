@@ -79,8 +79,7 @@ public class ReputationSystem {
                 params.get("dbPASS"));
 
             if (channel.isOpen()) {
-             
-                channel.queueDeclare(params.get("queueName"), false, false, true, null);
+                channel.queueDeclare(params.get("queueName"), true, false, true, null);
             }
 
             // bind to queues
@@ -95,6 +94,7 @@ public class ReputationSystem {
     
             }catch (IOException | TimeoutException e) {
                 System.out.println("Reputation System error on create:" + e);
+                e.printStackTrace();
             }
     }
 

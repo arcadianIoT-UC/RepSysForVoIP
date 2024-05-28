@@ -27,7 +27,7 @@ parameters = pika.ConnectionParameters('localhost',
 connection = pika.BlockingConnection(parameters)   
 channel = connection.channel()
 
-channel.queue_declare(queue='rs_queue', auto_delete=True)
+channel.queue_declare(queue='rs_queue', auto_delete=False)
 
 exchangeName = 'CDR'
 routingKeyName = 'rs_queue'

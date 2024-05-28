@@ -1,7 +1,4 @@
-# Reputation System for NOMS'24 tutorial 
-
-
-The project contains the source files for the NOMS24 "Reputation System for 5G/6G Services".
+# Reputation System for VoIP Systems
 
 The tutorial is a result of the ARCADIAN-IoT project (arcadian-iot.eu)
 
@@ -16,9 +13,9 @@ if you aim to compile the application on your system
 - Docker
 - Docker compose
 
-## Running the tutorial
+## Running the code
 
-### Start RabbitMQ
+### Start RabbitMQ and MySQL
 
 ```
 docker-compose -f docker-composeRedis up
@@ -55,7 +52,11 @@ Execute the script:
 run.sh
 ```
 
-## Credits to:
+## Tests:
+
+
+
+## Credits:
 - Bruno Sousa, University of Coimbra
 - João Nunes, University of Coimbra
 - Daniel Vasconcelos, University of Coimbra
