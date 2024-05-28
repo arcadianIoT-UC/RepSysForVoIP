@@ -29,14 +29,14 @@ channel = connection.channel()
 
 channel.queue_declare(queue='rs_queue', auto_delete=False)
 
-exchangeName = 'CDR'
+exchangeName = 'IPREPUTATION'
 routingKeyName = 'rs_queue'
 
 if (option == "-p"):
-    
+    #result: "negative"
     dicio = {
         "IP": entityID,
-        "result": "success"
+        "result": "positive"
     }
 
     channel.basic_publish(exchange=exchangeName,
@@ -51,8 +51,7 @@ if (option == "-p"):
 if (option == "-n"):
     dicio = {
         "IP": entityID,
-        "result": "not successful",
-        "severity": 3.0
+        "result": "negative",
     }
 
     channel.basic_publish(exchange=exchangeName,

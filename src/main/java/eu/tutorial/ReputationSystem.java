@@ -158,7 +158,7 @@ public class ReputationSystem {
 
         switch(exchangeName){
             
-            case "CDR":
+            case "IPREPUTATION":
                 //TODO: Processing needs to be updated according to what it will be defined.
                 // 
                 if (jsonReceived.has("IP") && jsonReceived.has("result") ) {
@@ -180,6 +180,28 @@ public class ReputationSystem {
                 }
                 break;
             
+            //TODO:
+            case "USERREPUTATION":
+                //TODO: Processing needs to be updated according to what it will be defined.
+                // 
+                if (jsonReceived.has("IP") && jsonReceived.has("result") ) {
+                    reputationModel.addNewDataProcessor(jsonReceived.getString("IP"));
+                    boolean anomaly = false;
+                    String result=  jsonReceived.getString("result");
+                    if (result.equalsIgnoreCase("success")) {
+                        anomaly= false;
+                    }else{
+                        anomaly = true; // negative event
+                    }
+                    
+                    //Scale up the reputation score between 1  and 10 
+                    jsonToSend.put("currentScore", 10 * reputationModel.getReputationScore(jsonReceived.getString("IP")));
+                    jsonToSend.put("IP", jsonReceived.getString("IP"));
+                    
+                    //Update the values in the database
+                    updateDB(jsonReceived.getString("IP"), jsonToSend.getDouble("currentScore" ));
+                }
+                break;
             
 
         }
@@ -209,6 +231,7 @@ public class ReputationSystem {
     }
 
     //Updates the DB
+    //TODO:
     public boolean updateDB(String IP, double score)  {
         boolean res=mydb.addUpdateScore(IP, score);
         return res;
