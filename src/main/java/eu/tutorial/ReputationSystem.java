@@ -182,6 +182,16 @@ public class ReputationSystem {
             
             //TODO:
             case "USERREPUTATION":
+            /*
+             * src	result
+                XXX		negative or positive
+
+             * 
+             * src		result
+                1XX	negative or positive
+
+             * 
+             */
                 //TODO: Processing needs to be updated according to what it will be defined.
                 // 
                 if (jsonReceived.has("IP") && jsonReceived.has("result") ) {
