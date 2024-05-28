@@ -79,7 +79,7 @@ public class ReputationSystem {
                 params.get("dbPASS"));
 
             if (channel.isOpen()) {
-                channel.queueDeclare(params.get("queueName"), true, false, true, null);
+                channel.queueDeclare(params.get("queueName"), false, false, false, null);
             }
 
             // bind to queues
@@ -160,6 +160,7 @@ public class ReputationSystem {
             
             case "CDR":
                 //TODO: Processing needs to be updated according to what it will be defined.
+                // 
                 if (jsonReceived.has("IP") && jsonReceived.has("result") ) {
                     reputationModel.addNewDataProcessor(jsonReceived.getString("IP"));
                     boolean anomaly = false;
@@ -170,14 +171,16 @@ public class ReputationSystem {
                         anomaly = true; // negative event
                     }
                     
-                    //Get previous score before updating
-                    jsonToSend.put("currentScore", reputationModel.getReputationScore(jsonReceived.getString("IP")));
+                    //Scale up the reputation score between 1  and 10 
+                    jsonToSend.put("currentScore", 10 * reputationModel.getReputationScore(jsonReceived.getString("IP")));
                     jsonToSend.put("IP", jsonReceived.getString("IP"));
                     
                     //Update the values in the database
                     updateDB(jsonReceived.getString("IP"), jsonToSend.getDouble("currentScore" ));
                 }
                 break;
+            
+            
 
         }
         
