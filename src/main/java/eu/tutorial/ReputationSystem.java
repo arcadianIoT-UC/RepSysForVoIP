@@ -70,6 +70,7 @@ public class ReputationSystem {
             factory.setVirtualHost(params.get("virtualHost"));
             factory.setUsername(params.get("username"));
             factory.setPassword(params.get("password"));
+            factory.setAutomaticRecoveryEnabled(true);
             Connection connection = factory.newConnection();
             channel = connection.createChannel();
 
@@ -79,7 +80,7 @@ public class ReputationSystem {
                 params.get("dbPASS"));
 
             if (channel.isOpen()) {
-                channel.queueDeclare(params.get("queueName"), false, false, false, null);
+                channel.queueDeclare(params.get("queueName"), true, false, false, null);
             }
 
             // bind to queues
@@ -162,25 +163,28 @@ public class ReputationSystem {
                 //TODO: Processing needs to be updated according to what it will be defined.
                 // 
                 if (jsonReceived.has("IP") && jsonReceived.has("result") ) {
+                    
                     reputationModel.addNewDataProcessor(jsonReceived.getString("IP"));
                     boolean anomaly = false;
                     String result=  jsonReceived.getString("result");
-                    if (result.equalsIgnoreCase("success")) {
+                    if (result.equalsIgnoreCase("positive")) {
                         anomaly= false;
                     }else{
                         anomaly = true; // negative event
                     }
                     
                     //Scale up the reputation score between 1  and 10 
-                    jsonToSend.put("currentScore", 10 * reputationModel.getReputationScore(jsonReceived.getString("IP")));
+                    reputationModel.updateReputationScore(jsonReceived.getString("IP"), anomaly);
+                    
+                    jsonToSend.put("currentScore", reputationModel.getReputationScore(jsonReceived.getString("IP"), 10));
                     jsonToSend.put("IP", jsonReceived.getString("IP"));
                     
                     //Update the values in the database
-                    updateDB(jsonReceived.getString("IP"), jsonToSend.getDouble("currentScore" ));
+                    mydb.addUpdateIPScore(jsonReceived.getString("IP"), jsonToSend.getDouble("currentScore" ));
                 }
                 break;
             
-            //TODO:
+            
             case "USERREPUTATION":
             /*
              * src	result
@@ -192,24 +196,24 @@ public class ReputationSystem {
 
              * 
              */
-                //TODO: Processing needs to be updated according to what it will be defined.
-                // 
-                if (jsonReceived.has("IP") && jsonReceived.has("result") ) {
+                if (jsonReceived.has("SRC") && jsonReceived.has("result") ) {
                     reputationModel.addNewDataProcessor(jsonReceived.getString("IP"));
                     boolean anomaly = false;
                     String result=  jsonReceived.getString("result");
-                    if (result.equalsIgnoreCase("success")) {
+                    if (result.equalsIgnoreCase("positive")) {
                         anomaly= false;
                     }else{
                         anomaly = true; // negative event
                     }
                     
                     //Scale up the reputation score between 1  and 10 
-                    jsonToSend.put("currentScore", 10 * reputationModel.getReputationScore(jsonReceived.getString("IP")));
-                    jsonToSend.put("IP", jsonReceived.getString("IP"));
+                    reputationModel.updateReputationScore(jsonReceived.getString("SRC"), anomaly);
+                    
+                    jsonToSend.put("currentScore", reputationModel.getReputationScore(jsonReceived.getString("SRC"), 10));
+                    jsonToSend.put("SRC", jsonReceived.getString("SRC"));
                     
                     //Update the values in the database
-                    updateDB(jsonReceived.getString("IP"), jsonToSend.getDouble("currentScore" ));
+                    mydb.addUpdateUSERScore(jsonReceived.getString("SRC"), jsonToSend.getDouble("currentScore" ));
                 }
                 break;
             
@@ -240,10 +244,5 @@ public class ReputationSystem {
                 + new String(message.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8) + "'");
     }
 
-    //Updates the DB
-    //TODO:
-    public boolean updateDB(String IP, double score)  {
-        boolean res=mydb.addUpdateScore(IP, score);
-        return res;
-    }
+   
 }

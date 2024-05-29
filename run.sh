@@ -20,16 +20,16 @@ export FILE_NAME=HDFS_2k.log
 export MAVEN_OPTS="-Xmx6g -XX:ReservedCodeCacheSize=512m"
 
 # RabbitMQ info
-export RMQ_HOST="localhost"
+export RMQ_HOST="aiot-rs-prod.dei.uc.pt"
 export RMQ_PORT="5672"
-export RMQ_VIRTUAL_HOST="integration_environment"
+export RMQ_VIRTUAL_HOST="/"
 export RMQ_QUEUE_NAME="rs_queue"
 export RMQ_ROUTING_KEY="#"
 export RMQ_PORT=5672
-export RMQ_USERNAME="noms"
-export RMQ_PASSWORD="tutorial"
+export RMQ_USERNAME="reputation"
+export RMQ_PASSWORD="asterisk"
 
-export RMQ_EXCHANGES="CDR"
+export RMQ_EXCHANGES="IPREPUTATION,USERREPUTATION"
 
 # Mysql INFO
 export DB_URL="jdbc:mysql://localhost:3306/dbAsterisk"

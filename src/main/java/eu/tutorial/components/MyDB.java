@@ -73,35 +73,56 @@ public class MyDB {
     }
 
     
-    public boolean addUpdateScore(String ip, double iS){
+    public boolean addUpdateIPScore(String ip, double iS){
         boolean res=false;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
         try{
             // Create a simple query
-            String sql = "UPDATE ip_score_test SET score = " + iS + " where IP_address = '" + ip + "'";
+            String sql = "INSERT INTO ip_score (IP_address, score) VALUES('" + ip+ "'," + iS +") ON DUPLICATE key UPDATE score = " + iS ;
 
+            System.out.println("To EXEC  " + sql );
             // Create a statement
             preparedStatement = connection.prepareStatement(sql);
             int nRows  = preparedStatement.executeUpdate();
             System.out.println("Executed " + sql + " " + nRows);
             preparedStatement.close();
 
-            //TODO: code could be better
-            if (nRows == 0 ){ 
-                sql = "INSERT INTO ip_score_test (IP_address, score) VALUES('" + ip+ "''," + iS +")" ;
-                
-                preparedStatement = connection.prepareStatement(sql);
-                nRows  = preparedStatement.executeUpdate();
-                System.out.println("Executed INS" + sql + " " + nRows);
-                if (nRows ==1 ) res=true;
-            }
             if (nRows == 1){res= true;}
             else res= false;
             
         }catch(Exception e){
             //TODO:
+            System.out.println("Error on insert");
+            e.printStackTrace();
+        }        
+        return res;
+    }
+
+    public boolean addUpdateUSERScore(String ip, double iS){
+        boolean res=false;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try{
+            // Create a simple query
+            String sql = "INSERT INTO user_score (user, score) VALUES('" + ip+ "'," + iS +") ON DUPLICATE key UPDATE score = " + iS ;
+
+            System.out.println("To EXEC  " + sql );
+            // Create a statement
+            preparedStatement = connection.prepareStatement(sql);
+            int nRows  = preparedStatement.executeUpdate();
+            System.out.println("Executed " + sql + " " + nRows);
+            preparedStatement.close();
+
+            if (nRows == 1){res= true;}
+            else res= false;
+            
+        }catch(Exception e){
+            //TODO:
+            System.out.println("Error on insert");
+            e.printStackTrace();
         }        
         return res;
     }

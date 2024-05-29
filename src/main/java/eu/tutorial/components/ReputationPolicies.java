@@ -58,7 +58,7 @@ public class ReputationPolicies {
                 String actionDesc = policyInfo[3];
                 int action = Integer.parseInt(policyInfo[4]);
                 int actionRatio = Integer.parseInt(policyInfo[5]);
-                double actualRep = repModel.getReputationScore(entityID);
+                double actualRep = repModel.getReputationScore(entityID, 1);
                 
                 if ( actualRep > minReputation && actualRep < maxReputation) {
                     jsonToSend.put("actionDesc", actionDesc);

@@ -21,7 +21,9 @@
             "driver": "MySQL",
             "name": "RepSysDB",
             "database": "dbAsterisk",
-            "username": "noms"
+            "username": "noms",
+            "askForPassword": true
         }
-    ]
+    ],
+    "maven.view": "hierarchical"
 }

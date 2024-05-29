@@ -23,9 +23,9 @@ public class ReputationSystemModel {
         }
     }
 
-    public double getReputationScore(String dataProcessor) {
+    public double getReputationScore(String dataProcessor, int scale) {
         if (betaDistributions.containsKey(dataProcessor)) {
-            return betaDistributions.get(dataProcessor).getNumericalMean();
+            return betaDistributions.get(dataProcessor).getNumericalMean() * scale;
         } else {
             return NOT_FOUND;
         }
@@ -56,7 +56,7 @@ public class ReputationSystemModel {
     }
 
     public void addNewDataProcessor(String dataProcessor) {
-        betaDistributions.putIfAbsent(dataProcessor, new BetaDistribution(1, 1));
+        betaDistributions.putIfAbsent(dataProcessor, new BetaDistribution(1 , 1));
     }
 
     public void addExistingDataProcessor(String dataProcessor, double alpha, double beta) {

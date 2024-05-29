@@ -1,2 +1,3 @@
-select * from ip_score_test;
+select *  from ip_score;
+
 
