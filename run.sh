@@ -40,4 +40,4 @@ export DB_PASSWORD="tutorial"
 export EXECUTOR_MEMORY="10g"
 export DRIVER_MEMORY="10g"
 
-java -Xmx8096m -jar target/ReputationSystem-1.0-jar-with-dependencies.jar
+java -Xmx8096m -jar toExec/ReputationSystem-1.0-jar-with-dependencies.jar
