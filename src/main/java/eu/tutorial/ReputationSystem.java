@@ -197,7 +197,7 @@ public class ReputationSystem {
              * 
              */
                 if (jsonReceived.has("SRC") && jsonReceived.has("result") ) {
-                    reputationModel.addNewDataProcessor(jsonReceived.getString("IP"));
+                    reputationModel.addNewDataProcessor(jsonReceived.getString("SRC"));
                     boolean anomaly = false;
                     String result=  jsonReceived.getString("result");
                     if (result.equalsIgnoreCase("positive")) {
@@ -220,17 +220,16 @@ public class ReputationSystem {
 
         }
         
-        if (!(jsonToSend.length() == 0) && jsonToSend.has("IP") && jsonToSend.has("currentScore") ) {
-            String sentMessage = "SENDING MESSAGE " + jsonToSend.toString() + " to reputationUpdates exchange";
-            System.out.println(sentMessage);
-            
-            try {
-                sendReputationUpdates("reputationUpdates", jsonToSend.toString());
-            }catch(Exception e){
-                System.out.println("Exception occured " + e);
-            }
-        }
-    }
+    		if (!(jsonToSend.length() == 0) && (jsonToSend.has("IP") || jsonToSend.has("SRC")) && jsonToSend.has("currentScore")) {
+			String sentMessage = "SENDING MESSAGE " + jsonToSend.toString() + " to reputationUpdates exchange";
+			System.out.println(sentMessage);
+			
+			try {
+				sendReputationUpdates("reputationUpdates", jsonToSend.toString());
+			} catch (Exception e) {
+				System.out.println("Exception occurred " + e);
+			}
+		}
 
     //send json file to reputation_updates exchange 
     public void sendReputationUpdates(String exchange, String message)
