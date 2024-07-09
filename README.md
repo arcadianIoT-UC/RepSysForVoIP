@@ -47,7 +47,7 @@ Run the created container
 ```
 docker run --rm -it RepSys 
 ```
-else, run the created container using:
+else, run the created container using: (replace IP with correct host)
 ```
 docker run --rm -it \
     -e DB_URL=jdbc:mysql://<IP>:3306/dbAsterisk \
