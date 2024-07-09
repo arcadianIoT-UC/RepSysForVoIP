@@ -20,6 +20,11 @@ if you aim to compile the application on your system
 ```
 docker-compose -f docker-composeRedis up
 ```
+else, Start RabbitMQ and MySQL using:
+```
+docker-compose -f docker-composeRedis.yaml up --build
+```
+
 If everything is ok, access to the administration interface in your browser
 http://localhost:15672
 (credentials are in the docker compose file)
@@ -41,6 +46,14 @@ docker build -i RepSys .
 Run the created container
 ```
 docker run --rm -it RepSys 
+```
+else, run the created container using:
+```
+docker run --rm -it \
+    -e DB_URL=jdbc:mysql://<IP>:3306/dbAsterisk \
+    -e DB_USER=root \
+    -e DB_PASSWORD=tutorialRoot \
+    repsys
 ```
 
 #### Using the command line
